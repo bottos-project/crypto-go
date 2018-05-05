@@ -35,8 +35,7 @@ import (
 	"crypto/elliptic"
 	"math/big"
 	"unsafe"
-
-	"github.com/ethereum/go-ethereum/common/math"
+	//"github.com/bottos-project/crypto-go/secp256k1"
 )
 
 /*
@@ -231,8 +230,8 @@ func (BitCurve *BitCurve) ScalarMult(Bx, By *big.Int, scalar []byte) (*big.Int, 
 
 	// Do the multiplication in C, updating point.
 	point := make([]byte, 64)
-	math.ReadBits(Bx, point[:32])
-	math.ReadBits(By, point[32:])
+	ReadBits(Bx, point[:32])
+	ReadBits(By, point[32:])
 	pointPtr := (*C.uchar)(unsafe.Pointer(&point[0]))
 	scalarPtr := (*C.uchar)(unsafe.Pointer(&scalar[0]))
 	res := C.secp256k1_ext_scalar_mul(context, pointPtr, scalarPtr)
@@ -264,8 +263,8 @@ func (BitCurve *BitCurve) Marshal(x, y *big.Int) []byte {
 	byteLen := (BitCurve.BitSize + 7) >> 3
 	ret := make([]byte, 1+2*byteLen)
 	ret[0] = 4 // uncompressed point flag
-	math.ReadBits(x, ret[1:1+byteLen])
-	math.ReadBits(y, ret[1+byteLen:])
+	ReadBits(x, ret[1:1+byteLen])
+	ReadBits(y, ret[1+byteLen:])
 	return ret
 }
 
@@ -290,11 +289,11 @@ func init() {
 	// See SEC 2 section 2.7.1
 	// curve parameters taken from:
 	// http://www.secg.org/collateral/sec2_final.pdf
-	theCurve.P = math.MustParseBig256("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F")
-	theCurve.N = math.MustParseBig256("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141")
-	theCurve.B = math.MustParseBig256("0x0000000000000000000000000000000000000000000000000000000000000007")
-	theCurve.Gx = math.MustParseBig256("0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798")
-	theCurve.Gy = math.MustParseBig256("0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8")
+	theCurve.P = MustParseBig256("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F")
+	theCurve.N = MustParseBig256("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141")
+	theCurve.B = MustParseBig256("0x0000000000000000000000000000000000000000000000000000000000000007")
+	theCurve.Gx = MustParseBig256("0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798")
+	theCurve.Gy = MustParseBig256("0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8")
 	theCurve.BitSize = 256
 }
 
