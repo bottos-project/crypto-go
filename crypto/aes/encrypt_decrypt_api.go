@@ -273,7 +273,7 @@ func DecryptKey(keyjson []byte, auth string) (*Key, error) {
 	}
 	key := ToECDSACRYPTOUnsafe(keyBytes)
     
-    fmt.Println("LYP: DecryptKey OK:  Id: ", uuid.UUID(keyId), ", UUID: ",  PubkeyToUUID(key.PublicKey), ", PubKey:[",  hex.EncodeToString(FromECDSACRYPTOPub(&key.PublicKey)) , "], PrivateKey:[", hex.EncodeToString(FromECDSACRYPTO(key)), "]")
+    fmt.Println("===>DecryptKey OK:  Id: ", uuid.UUID(keyId), ", UUID: ",  PubkeyToUUID(key.PublicKey), ", PubKey:[",  hex.EncodeToString(FromECDSACRYPTOPub(&key.PublicKey)) , "], PrivateKey:[", hex.EncodeToString(FromECDSACRYPTO(key)), "]")
 	
     return &Key{
 		Id:         uuid.UUID(keyId),
