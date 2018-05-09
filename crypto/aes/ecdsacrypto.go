@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 	"math/big"
-    "github.com/code/bottos/service/node/crypto-go/crypto/secp256k1"
+    "github.com/code/bottos/service/node/keystore/crypto-go/crypto/secp256k1"
 )
 
 var (
