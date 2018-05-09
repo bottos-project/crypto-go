@@ -151,7 +151,7 @@ func GenerateKey_ZL() (pubkey, seckey []byte) {
 
 var Pubkeytmp ecdsa.PublicKey
 
-func newKey(rand io.Reader) (*Key, error) {
+func NewKey(rand io.Reader) (*Key, error) {
 	privateKeyECDSA, err := ecdsa.GenerateKey(S256(), rand)
 	
     /*byte_pubkey, byte_privateKeyECDSA := GenerateKey_ZL()
