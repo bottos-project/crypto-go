@@ -9,8 +9,6 @@ import (
 	"io"
 	"math/big"
     "github.com/code/bottos/service/node/crypto-go/crypto/secp256k1"
-	"github.com/code/bottos/service/node/common/math"
-	//"github.com/code/bottos/service/node/crypto-go/crypto/sha3"
 )
 
 var (
@@ -127,7 +125,7 @@ func FromECDSACRYPTO(priv *ecdsa.PrivateKey) []byte {
 	if priv == nil {
 		return nil
 	}
-	return math.PaddedBigBytes(priv.D, priv.Params().BitSize/8)
+	return PaddedBigBytes(priv.D, priv.Params().BitSize/8)
 }
 
 func ToECDSACRYPTOPub(pub []byte) *ecdsa.PublicKey {
