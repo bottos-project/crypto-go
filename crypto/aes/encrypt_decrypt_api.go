@@ -220,7 +220,7 @@ func EncryptKey(key *Key, auth string, scryptN, scryptP int) ([]byte, error) {
 	return json.Marshal(encryptedKeyJSONV3)
 }
 
-func writeKeyFile(file string, content []byte) error {
+func WriteKeyFile(file string, content []byte) error {
 	// Create the keystore directory with appropriate permissions
 	// in case it is not present yet.
 	const dirPerm = 0700
