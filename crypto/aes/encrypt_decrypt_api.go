@@ -72,12 +72,14 @@ type Key struct {
 }
 
 type encryptedKeyJSONV3 struct {
+    Account string     `json:"account"`
 	Crypto  cryptoJSON `json:"crypto"`
 	Id      string     `json:"id"`
 	Version int        `json:"version"`
 }
 
 type encryptedKeyJSONV1 struct {
+    Account string     `json:"account"`
 	Crypto  cryptoJSON `json:"crypto"`
 	Id      string     `json:"id"`
 	Version string     `json:"version"`
@@ -176,7 +178,7 @@ func ensureInt(x interface{}) int {
 }
 // EncryptKey encrypts a key using the specified scrypt parameters into a json
 // blob that can be decrypted later on.
-func EncryptKey(key *Key, auth string, scryptN, scryptP int) ([]byte, error) {
+func EncryptKey(OptionalInfo string, key *Key, auth string, scryptN, scryptP int) ([]byte, error) {
 	authArray := []byte(auth)
 	salt := GetEntropyCSPRNG(32)
 	derivedKey, err := scrypt.Key(authArray, salt, scryptN, scryptR, scryptP, scryptDKLen)
@@ -213,6 +215,7 @@ func EncryptKey(key *Key, auth string, scryptN, scryptP int) ([]byte, error) {
 		MAC:          hex.EncodeToString(mac),
 	}
 	encryptedKeyJSONV3 := encryptedKeyJSONV3{
+        OptionalInfo,
 		cryptoStruct,
 		key.Id.String(),
 		version,
@@ -243,43 +246,48 @@ func WriteKeyFile(file string, content []byte) error {
 
 }
 // DecryptKey decrypts a key from a json blob, returning the private key itself.
-func DecryptKey(keyjson []byte, auth string) (*Key, error) {
+func DecryptKey(keyjson []byte, auth string) (*Key, string, error) {
 	// Parse the json into a simple map to fetch the key version
 	m := make(map[string]interface{})
 	if err := json.Unmarshal(keyjson, &m); err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	// Depending on the version try to parse one way or another
 	var (
 		keyBytes, keyId []byte
 		err             error
 	)
+    Account := ""
 	if version, ok := m["version"].(string); ok && version == "1" {
 		k := new(encryptedKeyJSONV1)
 		if err := json.Unmarshal(keyjson, k); err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		keyBytes, keyId, err = decryptKeyV1(k, auth)
+        Account = k.Account 
 	} else {
 		k := new(encryptedKeyJSONV3)
 		if err := json.Unmarshal(keyjson, k); err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		keyBytes, keyId, err = decryptKeyV3(k, auth)
+        Account = k.Account 
 	}
 	// Handle any decryption errors and return the key
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	key := ToECDSACRYPTOUnsafe(keyBytes)
     
-    fmt.Println("===>DecryptKey OK:  Id: ", uuid.UUID(keyId), ", UUID: ",  PubkeyToUUID(key.PublicKey), ", PubKey:[",  hex.EncodeToString(FromECDSACRYPTOPub(&key.PublicKey)) , "], PrivateKey:[", hex.EncodeToString(FromECDSACRYPTO(key)), "]")
+    fmt.Println("===>DecryptKey OK:", "Account: ", Account ,  ", Id: ", uuid.UUID(keyId), ", UUID: ",  PubkeyToUUID(key.PublicKey), ", PubKey:[",  hex.EncodeToString(FromECDSACRYPTOPub(&key.PublicKey)) , "], PrivateKey:[", hex.EncodeToString(FromECDSACRYPTO(key)), "]")
 	
     return &Key{
-		Id:         uuid.UUID(keyId),
+        
+        Id:      uuid.UUID(keyId),
 		UUID:    PubkeyToUUID(key.PublicKey),
 		PrivateKey: key,
-	}, nil
+
+	}, Account, nil
 }
 
 func decryptKeyV3(keyProtected *encryptedKeyJSONV3, auth string) (keyBytes []byte, keyId []byte, err error) {
@@ -502,13 +510,17 @@ func ReadBits(bigint *big.Int, buf []byte) {
 }    
 
 // Tests that a json key file can be decrypted and encrypted in multiple rounds.
-func KeyDecrypt(filename string, UserPassword string) {
+func KeyDecrypt(filename string, UserPassword string)(*Key, string) {
 	keyjson, err := ioutil.ReadFile(filename)
 	if err != nil {
 		Fatalf("err:", err)
 	}
 	password := UserPassword
-	if _, err := DecryptKey(keyjson, password); err == nil {
+	if key, Account, err := DecryptKey(keyjson, password); err == nil {
 		log.Println("KeyDecrypt : json key decrypted with password ok.")
+
+        return key, Account
 	}
+
+    return nil, ""
 }
