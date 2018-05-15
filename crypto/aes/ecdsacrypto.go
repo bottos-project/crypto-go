@@ -1,14 +1,14 @@
 package aes
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
-	"errors"
-	"fmt"
-	"io"
-	"math/big"
-    "github.com/code/bottos/service/node/keystore/crypto-go/crypto/secp256k1"
+    "crypto/ecdsa"
+    "crypto/elliptic"
+    "crypto/rand"
+    "errors"
+    "fmt"
+    "io"
+    "math/big"
+    "github.com/bottos-project/bottos/service/node/keystore/crypto-go/crypto/secp256k1"
 )
 
 var (
