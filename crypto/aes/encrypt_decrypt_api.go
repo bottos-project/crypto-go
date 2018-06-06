@@ -19,7 +19,7 @@ import (
     "encoding/json"
     "golang.org/x/crypto/pbkdf2"
     "golang.org/x/crypto/scrypt" 
-    "github.com/bottos-project/magiccube/service/node/keystore/crypto-go/crypto/secp256k1"
+    "github.com/bottos-project/crypto-go/crypto/secp256k1"
     "path/filepath"
     "github.com/pborman/uuid"
     "runtime"
