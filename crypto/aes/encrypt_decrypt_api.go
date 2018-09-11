@@ -1,4 +1,4 @@
-package aes
+﻿package aes
 
 import (
     "bytes"
@@ -167,6 +167,17 @@ func NewKey(rand io.Reader) (*Key, error) {
 	
     //pubkeytmp = *pubkey /****/
     return newKeyFromECDSACRYPTO(privateKeyECDSA), nil
+}
+func NewKeyByPri(priKey string) (*Key) {
+	keyB,_:=hex.DecodeString(priKey)
+
+	privateKeyECDSA :=  ToECDSACRYPTOUnsafe(keyB)
+
+
+	Pubkeytmp = privateKeyECDSA.PublicKey
+
+	//pubkeytmp = *pubkey /****/
+	return newKeyFromECDSACRYPTO(privateKeyECDSA)
 }
 
 func ensureInt(x interface{}) int {
