@@ -1,4 +1,4 @@
-package aes
+﻿package aes
 
 import (
     "crypto/ecdsa"
@@ -126,6 +126,14 @@ func FromECDSACRYPTO(priv *ecdsa.PrivateKey) []byte {
 		return nil
 	}
 	return PaddedBigBytes(priv.D, priv.Params().BitSize/8)
+}
+
+// FromECDSACRYPTOPub exports a private key into a binary dump.
+func FromPriECDSACRYPTOPub(priv *ecdsa.PrivateKey) []byte {
+	if priv == nil {
+		return nil
+	}
+	return elliptic.Marshal(secp256k1.S256(), priv.X, priv.Y)
 }
 
 func ToECDSACRYPTOPub(pub []byte) *ecdsa.PublicKey {
