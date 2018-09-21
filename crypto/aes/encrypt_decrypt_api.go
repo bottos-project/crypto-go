@@ -170,9 +170,8 @@ func NewKey(rand io.Reader) (*Key, error) {
 }
 func NewKeyByPri(priKey string) (*Key) {
 	keyB,_:=hex.DecodeString(priKey)
-
+	//keyB:=[]byte(priKey)
 	privateKeyECDSA :=  ToECDSACRYPTOUnsafe(keyB)
-
 
 	Pubkeytmp = privateKeyECDSA.PublicKey
 
@@ -187,6 +186,7 @@ func ensureInt(x interface{}) int {
 	}
 	return res
 }
+
 // EncryptKey encrypts a key using the specified scrypt parameters into a json
 // blob that can be decrypted later on.
 func EncryptKey(OptionalInfo string, key *Key, auth string, scryptN, scryptP int) ([]byte, error) {
@@ -256,6 +256,7 @@ func WriteKeyFile(file string, content []byte) error {
 	return os.Rename(f.Name(), file)
 
 }
+
 // DecryptKey decrypts a key from a json blob, returning the private key itself.
 func DecryptKey(keyjson []byte, auth string) (*Key, string, error) {
 	// Parse the json into a simple map to fetch the key version
@@ -297,7 +298,6 @@ func DecryptKey(keyjson []byte, auth string) (*Key, string, error) {
         Id:      uuid.UUID(keyId),
 		UUID:    PubkeyToUUID(key.PublicKey),
 		PrivateKey: key,
-
 	}, Account, nil
 }
 
@@ -521,17 +521,18 @@ func ReadBits(bigint *big.Int, buf []byte) {
 }    
 
 // Tests that a json key file can be decrypted and encrypted in multiple rounds.
-func KeyDecrypt(filename string, UserPassword string)(*Key, string) {
+func KeyDecrypt(filename string, UserPassword string)(*Key, string,error) {
 	keyjson, err := ioutil.ReadFile(filename)
 	if err != nil {
-		Fatalf("err:", err)
+		//Fatalf("err:", err)
+		return nil,"",err
 	}
 	password := UserPassword
 	if key, Account, err := DecryptKey(keyjson, password); err == nil {
 		log.Println("KeyDecrypt : json key decrypted with password ok.")
 
-        return key, Account
+        return key, Account,nil
 	}
 
-    return nil, ""
+    return nil, "",err
 }
